@@ -1,11 +1,21 @@
 <?php
+//On démarre la session
 session_start();
-if(isset($_SESSION['user'])){
-    header('location: accueil.php');
+//On verifie qu'une session est active
+if(!isset($_SESSION['user'])){
+    header('location: connexion.php');
     exit;
 }
-?>
+//On se connect à la base de donnée
+$conn = new PDO('mysql:host=localhost;dbname=bd_sporttrack;charset=utf8','root','');
 
+//On récupère les données de l'user 
+$req = "SELECT * FROM inscrit WHERE mail=:mail";
+$req = $conn->prepare($req);
+$req->execute(['mail'=>$_SESSION['user']]);
+$res = $req->fetch();
+$licence = $res['licence'];
+?>
 <!DOCTYPE html>
 <html lang="fr">
     <head>
@@ -15,7 +25,6 @@ if(isset($_SESSION['user'])){
 				<link rel="stylesheet" href="style.css" />
         <title>Sport Track</title>
     </head>
-
     <body>
         <!-- Corps de la page -->
         <header>
@@ -30,20 +39,43 @@ if(isset($_SESSION['user'])){
                 </ul>
             </nav>
         </header>
+        
         <main>
+            <!-- ICI CODER LA PAGE -->
             <section class="sectionTitre">
-                <h2 class="titrePage">Connexion</h2>
+                <h2 class="titrePage">Bienvenue !</h2>
             </section>
-            <section class="sectionPage">
-                <form class="formulaire" action="traitementConnexion.php" method="post">
-                    <input class="inputElement" type="email" name="email" placeholder="Email*">
-                    <input class="inputElement" type="password" name="passwd" placeholder="Mot de passe*">
-                    <input class="buttonFormulaire" type="submit" value="SE CONNECTER">
-                </form>
-                <p class="messageLinkToAnother">Vous n'avez pas de compte ?</p>
-                <p class="linkToAnother"><a href="inscription.php">Inscription</a></p>
+            <section id = "sectionSTCODE">
+            <div class="divBarres">
+                <img id="imageLogoST" src="img/logoWhiteSTCODE.png">
+                <span id="vertical0"></span>
+                <span id="vertical1"></span>
+                <span id="vertical2"></span>
+                <span id="vertical3"></span>
+                <span id="vertical4"></span>
+                <span id="vertical5"></span>
+                <span id="vertical6"></span>
+                <span id="vertical7"></span>
+                <span id="vertical8"></span>
+                <span id="vertical9"></span>
+                <span id="vertical10"></span>
+                <span id="vertical11"></span>
+                <span id="vertical12"></span>
+                <span id="vertical13"></span>
+                <span id="vertical14"></span>
+                <span id="vertical15"></span>
+                <span id="vertical16"></span>
+                <span id="vertical17"></span>
+                <span id="vertical18"></span>
+                <span id="vertical19"></span>
+                <span id="vertical20"></span>
+            </div>
+                <p id="licenceHiding"><?php print($licence) ?></p>
+                <button id="buttonStCode"> Agrandir le STCODE</button>
             </section>
+            <a href="deconnexion.php">Déconnexion</a>
         </main>
+        
         <footer>
             <section id="sectionMention">
                 <a class="lienFooter" href="#"><p>Mentions légales</p></a>
@@ -70,5 +102,8 @@ if(isset($_SESSION['user'])){
                 </form>           
             </section>
         </footer>
+        <script src="scripts/licence.js"></script>
+        <script src="scripts/photo.js"></script>
+        <script src="scripts/main.js"></script>
     </body>
 </html>

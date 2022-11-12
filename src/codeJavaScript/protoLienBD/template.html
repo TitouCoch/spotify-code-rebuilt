@@ -1,11 +1,3 @@
-<?php
-session_start();
-if(isset($_SESSION['user'])){
-    header('location: accueil.php');
-    exit;
-}
-?>
-
 <!DOCTYPE html>
 <html lang="fr">
     <head>
@@ -23,27 +15,18 @@ if(isset($_SESSION['user'])){
             <hr id="sepHeader">
             <nav id="barreNav">
                 <ul>
-                    <li class="elementBarreNav"><a href="accueil.php">Accueil</a></li>
+                    <li class="elementBarreNav"><a href="accueil.html">Accueil</a></li>
                     <li class="elementBarreNav"><a href="#">Calendrier</a></li>
                     <li class="elementBarreNav"><a href="#">Profil</a></li>
                     <li class="elementBarreNav"><a href="#">Message</a></li>
                 </ul>
             </nav>
         </header>
+
         <main>
-            <section class="sectionTitre">
-                <h2 class="titrePage">Connexion</h2>
-            </section>
-            <section class="sectionPage">
-                <form class="formulaire" action="traitementConnexion.php" method="post">
-                    <input class="inputElement" type="email" name="email" placeholder="Email*">
-                    <input class="inputElement" type="password" name="passwd" placeholder="Mot de passe*">
-                    <input class="buttonFormulaire" type="submit" value="SE CONNECTER">
-                </form>
-                <p class="messageLinkToAnother">Vous n'avez pas de compte ?</p>
-                <p class="linkToAnother"><a href="inscription.php">Inscription</a></p>
-            </section>
+            <!-- ICI CODER LA PAGE -->
         </main>
+        
         <footer>
             <section id="sectionMention">
                 <a class="lienFooter" href="#"><p>Mentions légales</p></a>

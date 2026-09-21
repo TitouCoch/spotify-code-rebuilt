@@ -1,1 +1,14 @@
+# Dependencies
+node_modules/
+
+# Build output
+native/cpp/build/
+
+# Environment
+.env
+
+# IDE / OS
+.idea/
+.vscode/
 .DS_Store
+~$*

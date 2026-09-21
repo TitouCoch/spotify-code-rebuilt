@@ -1,47 +1,69 @@
-# Sport Track
+# Spotify Code Rebuilt
 
-[![forthebadge](https://forthebadge.com/images/badges/built-by-developers.svg)](https://forthebadge.com)
-[![forthebadge](https://forthebadge.com/images/badges/made-with-javascript.svg)](https://forthebadge.com)
-[![forthebadge](https://forthebadge.com/images/badges/for-you.svg)](https://forthebadge.com)
+**Scannable "sound-wave" codes like Spotify Codes, rebuilt from scratch and decoded from a webcam in the browser using classic computer vision.**
 
-![Schéma de la structure du GitHub](https://imgur.com/IjICbvo.png)
+![Demo: generating a code, then scanning it from a phone screen](assets/demo.gif)
 
-URL : http://sport-track.alwaysdata.net/
+## Why
 
-## Présentation application
-
-Sport Track est une  application web de gestion de club sportif amateur. Pour but d'accompagner les sportifs licenciés, les dirigeants et entraîneurs amateurs dans leurs épanouissement au sein de leurs clubs sportifs amateurs. 
-
-L’application se divisera en trois grandes fonctionnalités : une partie messagerie qui permettra aux acteurs de l’application de communiquer. L'entraîneur pourra communiquer avec ses joueurs et le dirigeant de son club, les joueurs pourront parler entre eux.
-La seconde partie de l’application sera la partie calendrier : les joueurs pourront consulter leurs entraînements, matchs avec le lieu et l’horaire, l'entraîneur pourra planifier ses entraînements, le dirigeant pourra gérer l’accès à son club et son terrain/salle de sport.
-La dernière partie de l’application sera une partie profil : statistiques, classement, palmarès et composition équipe mais aussi des équipes adverses.
-
-## Problème Algorithmique
-
-Nous avons incorporé un code barre unique à tous les utilisateurs de l'application qui est généré à partir de la licence. Cela permettra de vérifier l'identité d'une personne aux matchs et de mettre à jour le tableau des présences, qui pourra être consulté par l'entraineur.
-Suite à cela nous avons développé un scanneur sur mesure pour décoder l'information encodée dans le code barre et retrouver le numéro de licence.
-
-![Code barre](https://imgur.com/3D12ZPu.png)
-
-![Scanneur](https://imgur.com/i6A6oDd.png)
+[Spotify Codes](https://boonepeter.github.io/posts/2020-11-10-spotify-codes/) show that a row of bars of different heights can replace a QR code and look much better. The format is described in Spotify's patents (EP 3444755, US 2018/0181849), but no implementation is published.
 
 
-## Fabriqué avec
+- **Barcode format, based on Spotify Codes.** An ID of 10 alphanumeric characters becomes 20 bars with 8 possible heights, drawn next to a logo whose size gives the scanner a reference height. Spotify's own codes also carry 20 bars of data.
+- **Scanner that runs entirely in the browser.** OpenCV.js (WebAssembly) finds the bars in the webcam feed and corrects for rotation, using deterministic image processing only. The decoded ID is then checked against a database through a small PHP API.
+- **Prototype ports in C++ and Python** of the bar-height extraction step.
 
-* [Javascript-HTML-CSS](http://.com) - Langages
-* [VS_Code](https://visualStudioCode.io/) - Editeur de textes
-* [OPEN-CV](https://OPEN-CV.io/) - Bibliothèque
+## How it works
 
-## Versions
+**Encoding**: the example follows the character `A` through each step.
 
-* [Ebauche Fonctionnelle](https://github.com/TitouCoch/SportTrack/releases/tag/versionFonctionnelle) 
-* [Version Finale](https://github.com/TitouCoch/SportTrack/releases/tag/versionScannerFonctionnel)
+```mermaid
+flowchart LR
+    A(["<b>ID</b><br/>10 characters"])
+    B["<b>Gray code</b><br/>6 bits per char"]
+    C["<b>Split</b><br/>3-bit groups"]
+    D["<b>Bar heights</b><br/>1 to 8"]
+    E(["<b>Code</b><br/>logo + 20 bars"])
 
-## Auteurs
-- [Ivan Salle](https://github.com/IvanSalle)
-- [Titouan Cocheril](https://github.com/TitouCoch)
-- [Matis Chabanat](https://github.com/mchabanat)
-- [Arthur Le Menn](https://github.com/Arthur-Le-M)
+    A -- "A" --> B -- "010111" --> C -- "010 · 111" --> D -- "8 · 4" --> E
 
+    classDef io fill:#1E293B,stroke:#1E293B,color:#FFFFFF,stroke-width:1.5px
+    classDef step fill:#F8FAFC,stroke:#94A3B8,color:#0F172A,stroke-width:1.5px
+    class A,E io
+    class B,C,D step
+    linkStyle default stroke:#64748B,stroke-width:1.5px
+```
 
-``Merci de votre lecture !``
+**Decoding**
+
+```mermaid
+flowchart LR
+    subgraph CAPTURE ["Capture"]
+        direction TB
+        A(["Webcam frame"]) --> B["Crop + grayscale"]
+    end
+    subgraph VISION ["Computer vision · OpenCV.js"]
+        direction TB
+        C["Canny edges<br/>+ contours"] --> D["Rotation correction<br/>+ object filtering"]
+    end
+    subgraph DECODE ["Decode"]
+        direction TB
+        E["Height ratios<br/>vs. logo"] --> F["Gray code"] --> G(["ID"])
+    end
+    H[("API check<br/>MySQL")]
+
+    CAPTURE --> VISION --> DECODE --> H
+
+    classDef io fill:#1E293B,stroke:#1E293B,color:#FFFFFF,stroke-width:1.5px
+    classDef step fill:#F8FAFC,stroke:#94A3B8,color:#0F172A,stroke-width:1.5px
+    classDef db fill:#E2E8F0,stroke:#475569,color:#0F172A,stroke-width:1.5px
+    class A,G io
+    class B,C,D,E,F step
+    class H db
+    style CAPTURE fill:transparent,stroke:#94A3B8,stroke-dasharray:4 4
+    style VISION fill:transparent,stroke:#94A3B8,stroke-dasharray:4 4
+    style DECODE fill:transparent,stroke:#94A3B8,stroke-dasharray:4 4
+    linkStyle default stroke:#64748B,stroke-width:1.5px
+```
+
+As in Spotify's design, the bars use **Gray code**: two neighboring heights differ by only one bit. If a bar is misread as the next height up or down, only one bit of the result is wrong. Spotify also adds a CRC and forward error correction, which are the next step for this project.

@@ -1,4 +1,8 @@
-* linguist-detectable=false
+.DS_Store* linguist-detectable=false
 *.cpp linguist-detectable=true
 *.js linguist-detectable=true
 *.py linguist-detectable=true
+
+# Third-party and generated files, excluded from GitHub language stats
+**/opencv.js linguist-vendored
+docs/** linguist-generated

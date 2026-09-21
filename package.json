@@ -1,0 +1,13 @@
+{
+  "name": "spotify-code-rebuilt",
+  "version": "1.0.0",
+  "description": "Spotify-Codes-style scannable barcodes, encoded and decoded in the browser with classic computer vision (no AI)",
+  "private": true,
+  "scripts": {
+    "start": "php -S localhost:8000",
+    "docs": "jsdoc -c jsdoc.json"
+  },
+  "devDependencies": {
+    "jsdoc": "^4.0.4"
+  }
+}
